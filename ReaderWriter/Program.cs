@@ -34,7 +34,10 @@ public class ReaderWriter
 		{
 			_mutex.WaitOne(); // acquire lock to increment readerCount by 1.
 			readerCount += 1;
-			if (readerCount == 1) // ensure no writer can enter if there is even 1 reader.
+			// when we are reading, no one should be allowed to write, thus the wrt semaphore should be acquired;
+			// so if we are the first reader, we acquire it (and wait till it's released if someone's still writing);
+			// but if someone's already reading, it means they have already acquired _write, so we just skip this part.
+			if (readerCount == 1)
 			{
 				_write.WaitOne();
 			}
